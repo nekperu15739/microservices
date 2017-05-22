@@ -33,28 +33,15 @@ public class SpringCloudConfigApplicationTest {
     @Value("${spring.application.name:licensingservice}")
     private String application;
     
+    private static final String SEPARATOR = "/";
     private static final String LABEL = "/label";
     private static final String PROFILES_DEV = "dev";
+    
     private static final String ROUTE_ONE = "/%s/%s%s";
     private static final String ROUTE_TWO = "/%s-%s.yml";
     private static final String ROUTE_THREE = "%s/%s-%s.yml";
     private static final String ROUTE_FOUR = "/%s-%s.properties";
-    private static final String ROUTE_FIVE = "%s%s-%s.properties";
-    
-    /**
-     * /{application}/{profile}[/{label}]
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void routeOneWithOutLabelTest() throws Exception {
-        String contentAsString = this.mvc.perform(get(String.format(ROUTE_ONE, application, PROFILES_DEV, StringUtils.EMPTY)).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        System.out.println(contentAsString);
-        
-        this.mvc.perform(get(String.format(ROUTE_ONE, application, PROFILES_DEV, StringUtils.EMPTY)).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andExpect(content().string(containsString("10")));
-    }
+    private static final String ROUTE_FIVE = "%s/%s-%s.properties";
     
     /**
      * /{application}/{profile}[/{label}]
@@ -63,10 +50,8 @@ public class SpringCloudConfigApplicationTest {
      */
     @Test
     public void routeOneTest() throws Exception {
-        String contentAsString = this.mvc.perform(get(String.format(ROUTE_ONE, application, PROFILES_DEV, LABEL)).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        System.out.println(contentAsString);
-        
+        this.mvc.perform(get(String.format(ROUTE_ONE, application, PROFILES_DEV, StringUtils.EMPTY)).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().string(containsString("10")));
         
         this.mvc.perform(get(String.format(ROUTE_ONE, application, PROFILES_DEV, LABEL)).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk()).andExpect(content().string(containsString("20")));
@@ -80,7 +65,7 @@ public class SpringCloudConfigApplicationTest {
     @Test
     public void routeTwoTest() throws Exception {
         this.mvc.perform(get(String.format(ROUTE_TWO, application, PROFILES_DEV)).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk()).andExpect(content().string(containsString("author")));
+        .andExpect(status().isOk()).andExpect(content().string(containsString("10")));
     }
     
     /**
@@ -91,7 +76,7 @@ public class SpringCloudConfigApplicationTest {
     @Test
     public void routeThreeTest() throws Exception {
         this.mvc.perform(get(String.format(ROUTE_THREE, LABEL ,application, PROFILES_DEV)).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk()).andExpect(content().string(containsString("author")));
+        .andExpect(status().isOk()).andExpect(content().string(containsString("20")));
     }
     
     
@@ -102,18 +87,15 @@ public class SpringCloudConfigApplicationTest {
     @Test
     public void routeFourTest() throws Exception {
         this.mvc.perform(get(String.format(ROUTE_FOUR, application, PROFILES_DEV)).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk()).andExpect(content().string(containsString("author")));
+        .andExpect(status().isOk()).andExpect(content().string(containsString("10")));
     }
 
     /**
      *  /{label}/{application}-{profile}.properties
      */
-    @Ignore("the response is empty")
     @Test
     public void routeFiveTest() throws Exception {
-        String contentAsString = this.mvc.perform(get(String.format(ROUTE_FIVE, LABEL, application, PROFILES_DEV)).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-//        andExpect(content().string(containsString("author")));
-        System.out.println(contentAsString);
+        this.mvc.perform(get(String.format(ROUTE_FIVE, LABEL, application, PROFILES_DEV)).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk()).andExpect(content().string(containsString("20")));
     }
 }
